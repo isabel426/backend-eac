@@ -24,4 +24,9 @@ class PerfilSituacion extends Model
     {
         return $this->belongsTo(PerfilHabilitacion::class);
     }
+
+    public function situacionCompetencia(): BelongsTo
+    {
+        return $this->belongsTo(SituacionCompetencia::class);
+    }
 }
