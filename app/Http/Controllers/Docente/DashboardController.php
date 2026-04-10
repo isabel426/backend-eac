@@ -15,16 +15,14 @@ class DashboardController extends Controller
         $docenteRoleId = Role::where('name', 'docente')->value('id');
 
         $ecosistemas = auth()->user()
-            ->userRoles()
-            ->where('role_id', $docenteRoleId)
+            ->ecosistemasAsignados()
+            ->wherePivot('role_id', $docenteRoleId)
             ->with([
-                'ecosistemaLaboral.modulo',
-                'ecosistemaLaboral.situacionesCompetencia',
-                'ecosistemaLaboral.perfilesHabilitacion',
+                'modulo',
+                'situacionesCompetencia',
+                'perfilesHabilitacion',
             ])
-            ->get()
-            ->pluck('ecosistemaLaboral')
-            ->filter();
+            ->get();
 
         return view('docente.dashboard', compact('ecosistemas'));
     }

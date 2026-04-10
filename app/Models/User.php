@@ -9,11 +9,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -41,20 +42,18 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
-    public function roles(): BelongsToMany
+    public function userRoles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles')
             ->withPivot('ecosistema_laboral_id')
             ->withTimestamps();
     }
+
 
     // Ecosistemas en los que está matriculado (como estudiante)
     public function matriculas(): HasMany
@@ -69,6 +68,16 @@ class User extends Authenticatable
             'matriculas',
             'estudiante_id'
         )->withTimestamps();
+    }
+
+    public function ecosistemasAsignados(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            EcosistemaLaboral::class,
+            'user_roles',
+            'user_id',
+            'ecosistema_laboral_id'
+        )->withPivot('role_id')->withTimestamps();
     }
 
     // Perfiles de habilitación del estudiante

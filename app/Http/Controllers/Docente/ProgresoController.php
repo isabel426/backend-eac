@@ -4,18 +4,16 @@ namespace App\Http\Controllers\Docente;
 
 use App\Http\Controllers\Controller;
 use App\Models\EcosistemaLaboral;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 // app/Http/Controllers/Docente/ProgresoController.php
 class ProgresoController extends Controller
 {
-    public function __invoke(EcosistemaLaboral $ecosistema): View
+    public function __invoke(EcosistemaLaboral $ecosistema)
     {
         $esDocente = auth()->user()
             ->userRoles()
             ->where('ecosistema_laboral_id', $ecosistema->id)
-            ->whereHas('role', fn($q) => $q->where('name', 'docente'))
+            ->where('name', 'docente')
             ->exists();
 
         abort_unless($esDocente, 403);

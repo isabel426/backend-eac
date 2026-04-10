@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('role', function (string $role): bool {
             // auth()->check() comprueba que hay un usuario autenticado
             // auth()->user()->hasRole($role) reutiliza el helper definido en User
-            return auth()->check() && auth()->user()->hasRole($role);
+            return auth()->user() && auth()->user()->hasRole($role);
         });
     }
 }

@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             ModulosFormativosSeeder::class,
             ResultadosAprendizajeSeeder::class,
             CriteriosEvaluacionSeeder::class,
+            EcosistemaLaboralSeeder::class,
+
         ]);
     }
 }
