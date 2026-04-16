@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             ResultadosAprendizajeSeeder::class,
             CriteriosEvaluacionSeeder::class,
             EcosistemaLaboralSeeder::class,
+            PerfilSituacionSeeder::class,
 
         ]);
     }
