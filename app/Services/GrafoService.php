@@ -130,7 +130,7 @@ class GrafoService
         // Lista de adyacencia: sc_id → [sc_requisito_id, ...]
         // groupBy preserva todas las filas aunque sc_id se repita
         $adyacencia = DB::table('sc_precedencia')
-            ->join('situaciones_competencia as sc', 'sc.id', '=', 'sc_precedencia.sc_id')
+            ->join('situacion_competencias as sc', 'sc.id', '=', 'sc_precedencia.sc_id')
             ->where('sc.ecosistema_laboral_id', $ecosistema->id)
             ->get(['sc_precedencia.sc_id', 'sc_precedencia.sc_requisito_id'])
             ->groupBy('sc_id')
@@ -186,7 +186,7 @@ class GrafoService
 
         foreach ($scs as $sc) {
             foreach ($sc->prerequisitos as $pre) {
-                $gradoEntrada[$sc->id]++;
+                $gradoEntrada->put($sc->id, $gradoEntrada->get($sc->id) + 1);
             }
         }
 
@@ -200,7 +200,7 @@ class GrafoService
 
             // Reducir grado de entrada de los dependientes
             foreach ($scs[$id]->dependientes ?? [] as $dep) {
-                $gradoEntrada[$dep->id]--;
+                $gradoEntrada->put($dep->id, $gradoEntrada->get($dep->id) - 1);
                 if ($gradoEntrada[$dep->id] === 0) {
                     $cola[] = $dep->id;
                 }
