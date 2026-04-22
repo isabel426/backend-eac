@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('situacion_competencias', function (Blueprint $table) {
+        Schema::create('situaciones_competencias', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ecosistema_laboral_id')
                 ->constrained('ecosistemas_laborales')
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('situacion_competencias');
+        Schema::dropIfExists('situaciones_competencias');
     }
 };

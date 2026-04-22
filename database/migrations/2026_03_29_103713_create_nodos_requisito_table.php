@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('nodos_requisito', function (Blueprint $table) {
             $table->id();
             $table->foreignId('situacion_competencia_id')
-                ->constrained('situacion_competencias')
+                ->constrained('situaciones_competencias')
                 ->cascadeOnDelete();
             $table->enum('tipo', ['conocimiento', 'habilidad']);
             $table->text('descripcion');

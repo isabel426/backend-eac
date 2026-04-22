@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sc_criterios_evaluacion', function (Blueprint $table) {
             $table->foreignId('situacion_competencia_id')
-                ->constrained('situacion_competencias')
+                ->constrained('situaciones_competencias')
                 ->cascadeOnDelete();
             $table->foreignId('criterio_evaluacion_id')
                 ->constrained('criterios_evaluacion')

@@ -16,7 +16,7 @@ return new class extends Migration
                 ->constrained('perfiles_habilitacion')
                 ->cascadeOnDelete();
             $table->foreignId('situacion_competencia_id')
-                ->constrained('situacion_competencias')
+                ->constrained('situaciones_competencias')
                 ->cascadeOnDelete();
 
             // Gradiente de Autonomía alcanzado

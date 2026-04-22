@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('sc_precedencia', function (Blueprint $table) {
             // La SC que requiere un prerequisito
             $table->foreignId('sc_id')
-                ->constrained('situacion_competencias')
+                ->constrained('situaciones_competencias')
                 ->cascadeOnDelete();
             // La SC que debe estar conquistada previamente
             $table->foreignId('sc_requisito_id')
-                ->constrained('situacion_competencias')
+                ->constrained('situaciones_competencias')
                 ->cascadeOnDelete();
 
             $table->primary(['sc_id', 'sc_requisito_id']);

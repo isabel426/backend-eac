@@ -14,7 +14,7 @@ class SituacionCompetencia extends Model
 {
     use HasFactory;
 
-    protected $table = 'situacion_competencias';
+    protected $table = 'situaciones_competencias';
 
     protected $fillable = [
         'ecosistema_laboral_id', 'codigo', 'titulo', 'descripcion',
