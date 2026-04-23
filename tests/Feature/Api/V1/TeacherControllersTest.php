@@ -82,8 +82,11 @@ class TeacherControllersTest extends TestCase
         $this->assertEquals(2, $response->json('meta.total_matriculados'));
 
         // Verificar que cada elemento del data contiene estudiante_id y total_scs
-        $response->assertJson(fn (AssertableJson $json) =>
-            $json->has('data.0', fn (AssertableJson $json) =>
+        $response->assertJson(
+            fn(AssertableJson $json) =>
+            $json->has(
+                'data.0',
+                fn(AssertableJson $json) =>
                 $json->hasAll(['estudiante_id', 'conquistadas', 'total_scs', 'calificacion'])->etc()
             )->has('data.1')->etc()
         );
@@ -141,7 +144,8 @@ class TeacherControllersTest extends TestCase
 
         $response = $this->postJson('/api/v1/docente/ecosistemas/' . $ecos->id . '/conquistas', $payload);
         $response->assertStatus(422)
-            ->assertJson(fn (AssertableJson $json) =>
+            ->assertJson(
+                fn(AssertableJson $json) =>
                 $json->where('status', 422)->has('detail')->etc()
             );
     }
@@ -199,7 +203,25 @@ class TeacherControllersTest extends TestCase
         Matricula::create(['estudiante_id' => $student->id, 'modulo_id' => $ecos->modulo_id]);
         $perfil = PerfilHabilitacion::create(['estudiante_id' => $student->id, 'ecosistema_laboral_id' => $ecos->id, 'calificacion_actual' => 0]);
 
-        $sc = SituacionCompetencia::factory()->create(['ecosistema_laboral_id' => $ecos->id, 'umbral_maestria' => 50.00]);
+        // 1. Creamos un RA para el módulo del ecosistema
+        $ra = \App\Models\ResultadoAprendizaje::factory()->create([
+            'modulo_id' => $ecos->modulo_id,
+            'peso_porcentaje' => 100
+        ]);
+
+        // 2. Creamos un CE para ese RA
+        $ce = \App\Models\CriterioEvaluacion::factory()->create([
+            'resultado_aprendizaje_id' => $ra->id
+        ]);
+
+        // 3. Creamos la SC y la VINCULAMOS al CE (importante para el índice del servicio)
+        $sc = SituacionCompetencia::factory()->create([
+            'ecosistema_laboral_id' => $ecos->id,
+            'umbral_maestria' => 50.00
+        ]);
+
+        // Vinculamos la SC con el CE en la tabla pivote (asegúrate de que el nombre de la relación sea correcto)
+        $sc->criteriosEvaluacion()->attach($ce->id, ['peso_en_sc' => 100]);
 
         Sanctum::actingAs($docente);
 
@@ -213,11 +235,14 @@ class TeacherControllersTest extends TestCase
         $response = $this->postJson('/api/v1/docente/ecosistemas/' . $ecos->id . '/conquistas', $payload);
 
         $response->assertStatus(201)
-            ->assertJson(fn (AssertableJson $json) =>
-                $json->has('data', fn (AssertableJson $json) =>
+            ->assertJson(
+                fn(AssertableJson $json) =>
+                $json->has(
+                    'data',
+                    fn(AssertableJson $json) =>
                     $json->where('sc_codigo', $sc->codigo)
-                         ->where('puntuacion_conquista', 85.5)
-                         ->etc()
+                        ->where('puntuacion_conquista', 85.5)
+                        ->etc()
                 )->has('meta')
             );
 

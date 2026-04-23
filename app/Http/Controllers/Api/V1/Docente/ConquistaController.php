@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EcosistemaLaboral;
 use App\Models\PerfilHabilitacion;
 use App\Models\SituacionCompetencia;
+use App\Services\CalificacionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,11 @@ use Illuminate\Validation\Rule;
 
 class ConquistaController extends Controller
 {
+    public function __construct(
+        private readonly CalificacionService $calificacionService,
+    ) {}
+
+
     /**
      * POST /api/v1/docente/ecosistemas/{ecosistema}/conquistas
      *
@@ -33,7 +39,7 @@ class ConquistaController extends Controller
         $data = $request->validate([
             'estudiante_id'       => ['required', 'integer', 'exists:users,id'],
             'sc_codigo'           => ['required', 'string'],
-            'gradiente_autonomia' => ['required', Rule::in(['asistido','guiado','supervisado','autonomo'])],
+            'gradiente_autonomia' => ['required', Rule::in(['asistido', 'guiado', 'supervisado', 'autonomo'])],
             'puntuacion_conquista' => ['required', 'numeric', 'min:0', 'max:100'],
         ]);
 
@@ -49,7 +55,7 @@ class ConquistaController extends Controller
                 'title'  => 'Umbral de maestría no alcanzado',
                 'status' => 422,
                 'detail' => "La puntuación {$data['puntuacion_conquista']} no supera el umbral "
-                          . "de maestría de la SC {$sc->codigo} ({$sc->umbral_maestria}%).",
+                    . "de maestría de la SC {$sc->codigo} ({$sc->umbral_maestria}%).",
             ], 422);
         }
 
@@ -88,10 +94,8 @@ class ConquistaController extends Controller
 
             // Recalcular calificación actual del perfil
             // (lógica completa en Unidad 7; aquí usamos media ponderada simple)
-            $nuevaCalificacion = $perfil->situacionesConquistadas()
-                ->avg('perfil_situacion.puntuacion_conquista');
 
-            $perfil->update(['calificacion_actual' => round($nuevaCalificacion, 2)]);
+            $this->calificacionService->calcularYPersistir($perfil->fresh());
         });
 
         return response()->json([

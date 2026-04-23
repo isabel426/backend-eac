@@ -18,6 +18,8 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->string('codigo', 5);             // Ej: "RA1", "RA2"
             $table->text('descripcion');
+            $table->decimal('peso_porcentaje', 5, 2)->default(0);
+
             $table->timestamps();
 
             $table->unique(['modulo_id', 'codigo']);
