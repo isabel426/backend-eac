@@ -16,26 +16,33 @@
         <div>
             <p class="font-mono text-xs text-gray-400">{{ $modulo->codigo }}</p>
             <h1 class="text-2xl font-bold text-gray-900 mt-0.5">{{ $modulo->nombre }}</h1>
-            @if($perfil)
+            @if ($perfil)
                 <p class="text-sm text-gray-500 mt-1">
                     Calificación actual:
                     <span class="font-semibold text-vfds-primary">
                         {{ number_format($perfil->calificacion_actual, 2) }}
                     </span>
                 </p>
+
+                {{-- dentro del panel de progreso del estudiante --}}
+                <a href="{{ route('estudiante.huella-radar', $perfil->ecosistemaLaboral) }}"
+                    class="btn btn-outline-indigo btn-sm">
+                    🎯 Ver mi Huella de Talento
+                </a>
             @endif
         </div>
-        <a href="{{ route('publico.modulos.show', $modulo) }}"
-           class="text-sm text-gray-400 hover:text-gray-600 underline">
+        <a href="{{ route('publico.modulos.show', $modulo) }}" class="text-sm text-gray-400 hover:text-gray-600 underline">
             Ver detalle del módulo
         </a>
     </div>
 
     {{-- Baner de recomendación (solo si la ZDP no está vacía) --}}
-    @if($recomendacion)
-        <div class="bg-vfds-primary/5 border border-vfds-primary/20 rounded-xl px-5 py-4 mb-8
+    @if ($recomendacion)
+        <div
+            class="bg-vfds-primary/5 border border-vfds-primary/20 rounded-xl px-5 py-4 mb-8
                     flex items-start gap-4">
-            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-vfds-primary/10 flex items-center
+            <div
+                class="flex-shrink-0 w-9 h-9 rounded-full bg-vfds-primary/10 flex items-center
                         justify-center text-vfds-primary font-bold text-sm">
                 →
             </div>
@@ -49,7 +56,7 @@
                 </p>
                 <p class="text-xs text-gray-500 mt-1">
                     Nivel de complejidad {{ $recomendacion->nivel_complejidad }}/5
-                    @if($recomendacion->prerequisitos->isEmpty())
+                    @if ($recomendacion->prerequisitos->isEmpty())
                         · Sin prerequisitos
                     @else
                         · Requiere: {{ $recomendacion->prerequisitos->pluck('codigo')->join(', ') }}
@@ -68,11 +75,7 @@
 
     {{-- Leyenda de estados --}}
     <div class="flex flex-wrap gap-3 mb-6 text-xs">
-        @foreach([
-            ['bg-green-100 text-green-700',             'Conquistadas',  $clasificacion['conquistadas']->count()],
-            ['bg-vfds-primary/10 text-vfds-primary',    'Disponibles',   $clasificacion['zdp']->count()],
-            ['bg-gray-100 text-gray-400',               'Bloqueadas',    $clasificacion['bloqueadas']->count()],
-        ] as [$cls, $label, $count])
+        @foreach ([['bg-green-100 text-green-700', 'Conquistadas', $clasificacion['conquistadas']->count()], ['bg-vfds-primary/10 text-vfds-primary', 'Disponibles', $clasificacion['zdp']->count()], ['bg-gray-100 text-gray-400', 'Bloqueadas', $clasificacion['bloqueadas']->count()]] as [$cls, $label, $count])
             <span class="flex items-center gap-1.5 px-3 py-1 rounded-full {{ $cls }}">
                 {{ $label }}
                 <span class="font-bold">{{ $count }}</span>
@@ -81,28 +84,29 @@
     </div>
 
     {{-- Grupos de SCs --}}
-    @foreach([
-        'zdp'          => ['Disponibles',  'border-vfds-primary/30 bg-vfds-primary/5'],
-        'conquistadas' => ['Conquistadas', 'border-green-200 bg-green-50'],
-        'bloqueadas'   => ['Bloqueadas',   'border-gray-200 bg-gray-50'],
-    ] as $grupo => [$label, $estilos])
-
+    @foreach ([
+            'zdp' => ['Disponibles', 'border-vfds-primary/30 bg-vfds-primary/5'],
+            'conquistadas' => ['Conquistadas', 'border-green-200 bg-green-50'],
+            'bloqueadas' => ['Bloqueadas', 'border-gray-200 bg-gray-50'],
+        ] as $grupo => [$label, $estilos])
         @php $items = $clasificacion[$grupo]; @endphp
 
-        @if($items->isNotEmpty())
+        @if ($items->isNotEmpty())
             <section class="mb-8">
                 <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">
                     {{ $label }} ({{ $items->count() }})
                 </h2>
 
                 <div class="space-y-2">
-                    @foreach($items as $sc)
-                        <div class="border {{ $estilos }} rounded-xl p-4
+                    @foreach ($items as $sc)
+                        <div
+                            class="border {{ $estilos }} rounded-xl p-4
                                     flex items-start gap-3
                                     {{ $recomendacion?->id === $sc->id ? 'ring-2 ring-vfds-primary' : '' }}">
 
                             {{-- Código SC --}}
-                            <span class="font-mono text-xs px-2 py-0.5 rounded
+                            <span
+                                class="font-mono text-xs px-2 py-0.5 rounded
                                          bg-white border border-gray-200 text-gray-600
                                          flex-shrink-0 mt-0.5">
                                 {{ $sc->codigo }}
@@ -112,7 +116,7 @@
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-800">
                                     {{ $sc->titulo }}
-                                    @if($recomendacion?->id === $sc->id)
+                                    @if ($recomendacion?->id === $sc->id)
                                         <span class="ml-2 text-xs font-normal text-vfds-primary">
                                             ← recomendada
                                         </span>
@@ -120,10 +124,11 @@
                                 </p>
 
                                 {{-- Nodos de requisito --}}
-                                @if($sc->nodosRequisito->isNotEmpty())
+                                @if ($sc->nodosRequisito->isNotEmpty())
                                     <div class="mt-2 flex flex-wrap gap-1">
-                                        @foreach($sc->nodosRequisito as $nodo)
-                                            <span class="text-xs bg-white border border-gray-200
+                                        @foreach ($sc->nodosRequisito as $nodo)
+                                            <span
+                                                class="text-xs bg-white border border-gray-200
                                                          rounded px-2 py-0.5 text-gray-500">
                                                 {{ ucfirst($nodo->tipo) }}: {{ Str::limit($nodo->descripcion, 50) }}
                                             </span>
@@ -132,7 +137,7 @@
                                 @endif
 
                                 {{-- Prerequisitos pendientes (solo bloqueadas) --}}
-                                @if($grupo === 'bloqueadas')
+                                @if ($grupo === 'bloqueadas')
                                     @php
                                         $pendientes = $sc->prerequisitos
                                             ->pluck('codigo')
@@ -150,25 +155,21 @@
                             {{-- Indicador de complejidad --}}
                             <div class="flex flex-col items-end gap-2 flex-shrink-0">
                                 <div class="flex items-center gap-0.5">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <span class="w-1.5 h-1.5 rounded-full
-                                            {{ $i <= $sc->nivel_complejidad
-                                                ? 'bg-vfds-primary'
-                                                : 'bg-gray-200' }}">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <span
+                                            class="w-1.5 h-1.5 rounded-full
+                                            {{ $i <= $sc->nivel_complejidad ? 'bg-vfds-primary' : 'bg-gray-200' }}">
                                         </span>
                                     @endfor
                                 </div>
 
                                 {{-- Badge de gradiente (solo conquistadas) --}}
-                                @if($grupo === 'conquistadas')
+                                @if ($grupo === 'conquistadas')
                                     @php
-                                        $pivot = $perfil->situacionesConquistadas
-                                            ->firstWhere('codigo', $sc->codigo)?->pivot;
+                                        $pivot = $perfil->situacionesConquistadas->firstWhere('codigo', $sc->codigo)
+                                            ?->pivot;
                                     @endphp
-                                    <x-gradiente-badge
-                                        :codigo="$sc->codigo"
-                                        :gradiente="$pivot?->gradiente_autonomia"
-                                    />
+                                    <x-gradiente-badge :codigo="$sc->codigo" :gradiente="$pivot?->gradiente_autonomia" />
                                 @endif
                             </div>
 
@@ -177,7 +178,6 @@
                 </div>
             </section>
         @endif
-
     @endforeach
 
 @endsection

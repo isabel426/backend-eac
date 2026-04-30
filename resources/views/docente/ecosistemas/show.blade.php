@@ -13,11 +13,15 @@
     </nav>
 
     {{-- Cabecera --}}
-    <div class="bg-eac-900 text-white rounded-xl px-8 py-6 mb-8">
+    <div class="bg-eac-900 text-black rounded-xl px-8 py-6 mb-8">
         <div class="flex items-start justify-between gap-4 flex-wrap">
             <div>
                 <p class="text-xs font-mono text-eac-50 opacity-70 mb-1">{{ $ecosistema->codigo }}</p>
                 <h1 class="text-2xl font-bold">{{ $ecosistema->nombre }}</h1>
+                {{-- dentro de la cabecera del ecosistema --}}
+                <a href="{{ route('docente.ecosistemas.analytics', $ecosistema) }}" class="btn btn-outline-primary btn-sm">
+                    📊 Ver analítica
+                </a>
                 <p class="text-gray-300 text-sm mt-1">
                     {{ $ecosistema->modulo->cicloFormativo->familiaProfesional->nombre }}
                     · {{ $ecosistema->modulo->cicloFormativo->nombre }}
@@ -46,18 +50,16 @@
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-semibold text-gray-900">Situaciones de Competencia</h2>
                     <a href="{{ route('docente.progreso.show', $ecosistema) }}"
-                       class="text-sm text-eac-500 hover:text-eac-700 underline">
+                        class="text-sm text-eac-500 hover:text-eac-700 underline">
                         Ver progreso del grupo →
                     </a>
                 </div>
 
                 <div class="space-y-3">
-                    @foreach($ecosistema->situacionesCompetencia->sortBy('nivel_complejidad') as $sc)
+                    @foreach ($ecosistema->situacionesCompetencia->sortBy('nivel_complejidad') as $sc)
                         @php
                             $conquistadas = $conquistasPorSc[$sc->codigo] ?? 0;
-                            $porcentaje   = $totalEstudiantes > 0
-                                ? round(($conquistadas / $totalEstudiantes) * 100)
-                                : 0;
+                            $porcentaje = $totalEstudiantes > 0 ? round(($conquistadas / $totalEstudiantes) * 100) : 0;
                         @endphp
 
                         <div class="border border-gray-200 rounded-xl overflow-hidden">
@@ -72,8 +74,9 @@
                                 </span>
                                 {{-- Nivel de complejidad --}}
                                 <div class="flex gap-0.5 flex-shrink-0">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <span class="w-1.5 h-1.5 rounded-full {{ $i <= $sc->nivel_complejidad ? 'bg-eac-500' : 'bg-gray-200' }}"></span>
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <span
+                                            class="w-1.5 h-1.5 rounded-full {{ $i <= $sc->nivel_complejidad ? 'bg-eac-500' : 'bg-gray-200' }}"></span>
                                     @endfor
                                 </div>
                             </div>
@@ -88,16 +91,17 @@
                                     </div>
                                     <div class="w-full bg-gray-100 rounded-full h-1.5">
                                         <div class="bg-eac-500 h-1.5 rounded-full transition-all"
-                                             style="width: {{ $porcentaje }}%"></div>
+                                            style="width: {{ $porcentaje }}%"></div>
                                     </div>
                                 </div>
 
                                 {{-- Prerequisitos --}}
-                                @if($sc->prerequisitos->isNotEmpty())
+                                @if ($sc->prerequisitos->isNotEmpty())
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <span class="text-xs text-gray-400">Requiere:</span>
-                                        @foreach($sc->prerequisitos as $pre)
-                                            <span class="font-mono text-xs bg-yellow-50 border border-yellow-200
+                                        @foreach ($sc->prerequisitos as $pre)
+                                            <span
+                                                class="font-mono text-xs bg-yellow-50 border border-yellow-200
                                                          text-yellow-700 px-2 py-0.5 rounded">
                                                 {{ $pre->codigo }}
                                             </span>
@@ -106,13 +110,14 @@
                                 @endif
 
                                 {{-- Criterios de Evaluación cubiertos --}}
-                                @if($sc->criteriosEvaluacion->isNotEmpty())
+                                @if ($sc->criteriosEvaluacion->isNotEmpty())
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <span class="text-xs text-gray-400">CE cubiertos:</span>
-                                        @foreach($sc->criteriosEvaluacion as $ce)
-                                            <span class="font-mono text-xs bg-blue-50 border border-blue-100
+                                        @foreach ($sc->criteriosEvaluacion as $ce)
+                                            <span
+                                                class="font-mono text-xs bg-blue-50 border border-blue-100
                                                          text-blue-600 px-2 py-0.5 rounded"
-                                                  title="{{ $ce->descripcion }}">
+                                                title="{{ $ce->descripcion }}">
                                                 {{ $ce->codigo }}
                                                 <span class="opacity-60">({{ $ce->pivot->peso_en_sc }}%)</span>
                                             </span>
@@ -131,22 +136,21 @@
         <div class="space-y-4">
             <h2 class="text-lg font-semibold text-gray-900">Trazabilidad curricular</h2>
 
-            @foreach($ecosistema->modulo->resultadosAprendizaje as $ra)
+            @foreach ($ecosistema->modulo->resultadosAprendizaje as $ra)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <div class="bg-gray-50 px-4 py-3 flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <span class="font-mono text-xs bg-eac-900 text-white px-2 py-0.5 rounded">
                                 {{ $ra->codigo }}
                             </span>
-                            <span class="text-xs font-medium text-gray-700 line-clamp-1"
-                                  title="{{ $ra->descripcion }}">
+                            <span class="text-xs font-medium text-gray-700 line-clamp-1" title="{{ $ra->descripcion }}">
                                 {{ Str::limit($ra->descripcion, 40) }}
                             </span>
                         </div>
                         <span class="text-xs text-gray-400 flex-shrink-0 ml-2">{{ $ra->peso_porcentaje }}%</span>
                     </div>
                     <ul class="divide-y divide-gray-100">
-                        @foreach($ra->criteriosEvaluacion as $ce)
+                        @foreach ($ra->criteriosEvaluacion as $ce)
                             <li class="px-4 py-2 flex items-start gap-2">
                                 <span class="font-mono text-xs text-gray-400 flex-shrink-0 mt-0.5">
                                     {{ $ce->codigo }}
