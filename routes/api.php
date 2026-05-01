@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\V1;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+})->middleware('auth:verifier,sanctum');
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
 
@@ -21,7 +21,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         ->name('ecosistemas.situaciones');
 
     // ── Autenticados (Sanctum) ───────────────────────────────────────────────────
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('auth:verifier,sanctum')->group(function () {
 
         // Estudiante
         Route::prefix('estudiante')->name('estudiante.')->group(function () {
